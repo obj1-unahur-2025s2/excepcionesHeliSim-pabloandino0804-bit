@@ -1,11 +1,13 @@
 package ar.edu.unahur.obj2.excepciones.modos;
 
-public class Modo {
+public class ModoNormal extends Modo{
+    @Override
     public Integer getConsumo(){
-        return 0;
-    };
+        return 9;
+    }
 
+    @Override
     public Integer getVelocidadMax(){
-        return 0;
-    };
+        return 220;
+    }
 }
