@@ -1,13 +1,18 @@
 package ar.edu.unahur.obj2.excepciones.modos;
 
-public class ModoAgresivo extends Modo{
+public class ModoAgresivo implements Modo{
     @Override
-    public Integer getConsumo(){
-        return 6;
+    public double getConsumo(){
+        return 6.0;
     }
 
     @Override
-    public Integer getVelocidadMax(){
-        return 280;
+    public double getVelocidadMax(){
+        return 280.0;
+    }
+
+    @Override
+    public String getNombre(){
+        return "Agresivo";
     }
 }

@@ -1,11 +1,9 @@
 package ar.edu.unahur.obj2.excepciones.modos;
 
-public class Modo {
-    public Integer getConsumo(){
-        return 0;
-    };
+public interface Modo {
+    double getConsumo();
 
-    public Integer getVelocidadMax(){
-        return 0;
-    };
+    double getVelocidadMax();
+
+    String getNombre();
 }

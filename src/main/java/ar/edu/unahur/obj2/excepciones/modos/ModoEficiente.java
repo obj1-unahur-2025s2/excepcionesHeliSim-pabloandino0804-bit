@@ -1,13 +1,18 @@
 package ar.edu.unahur.obj2.excepciones.modos;
 
-public class ModoEficiente extends Modo{
+public class ModoEficiente implements Modo{
     @Override
-    public Integer getConsumo(){
-        return 14;
+    public double getConsumo(){
+        return 14.0;
     }
 
     @Override
-    public Integer getVelocidadMax(){
-        return 180;
+    public double getVelocidadMax(){
+        return 180.0;
+    }
+
+    @Override 
+    public String getNombre(){
+        return "Eficiente";
     }
 }
