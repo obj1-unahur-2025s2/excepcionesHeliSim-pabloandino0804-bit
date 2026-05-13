@@ -3,7 +3,8 @@ package ar.edu.unahur.obj2.excepciones.helicopteros;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.edu.unahur.obj2.excepciones.misExepciones.CombustibleException;
+import ar.edu.unahur.obj2.excepciones.misExepciones.EstadoInvalidoException;
+import ar.edu.unahur.obj2.excepciones.misExepciones.UsoDeReservaException;
 import ar.edu.unahur.obj2.excepciones.modos.Modo;
 import ar.edu.unahur.obj2.excepciones.modos.ModoEficiente;
 
@@ -17,7 +18,7 @@ public abstract class Helicoptero {
 
     public Helicoptero(double combustibleInicial, double capacidad, Modo modoVuelo){
         if (combustibleInicial < 0){
-            throw new CombustibleException(
+            throw new EstadoInvalidoException(
                 "No se puede inicializar un helicoptero con combustible negativo"
                 + "valor recibido: " + combustibleInicial
             );
@@ -27,7 +28,8 @@ public abstract class Helicoptero {
         this.modoVuelo = new ModoEficiente();
     }
 
-    //Metodos que modifican el objeto
+    // Metodos que modifican el objeto
+    // -------------------------------
     public void volar(Double distanciaKm, Boolean volarHastaDondePueda){
         validarEstadoDeDespegue();
 
@@ -38,27 +40,94 @@ public abstract class Helicoptero {
         finalizarVuelo(kilometraje);
     }
     
-    private void ejecutarVuelo(Double distanciaKm, booleanvolarHastaDonde){
-        Double combustibleNecesario = calcularCombustibleNecesario(distanciaKm);
+    private void ejecutarVuelo(Double distanciaKm, Boolean volarHastaQuePueda){
+        Double combustibleNecesario = this.calcularCombustibleNecesario(distanciaKm);
+
+        Boolean usaReserva = this.consumeReserva(combustibleNecesario);
+
+        if(!this.puedeVolar(distanciaKm)){
+
+            if (volarHastaQuePueda){
+                volarParcialmente();
+                return;
+            }
+
+            throw new EstadoInvalidoException("No alcanza el combustible suficiente para vuelo completo");
+        };
+
+        this.combustible -= combustibleNecesario;
+        this.kilometraje += distanciaKm;
+        
+        if (usaReserva) {
+            throw new UsoDeReservaException(getReserva());
+        }
+        
+    }
+
+    private void volarParcialmente() {
+        Double distanciaRecorrida = calcularDistanciaDisponible();
+
+        kilometraje += distanciaRecorrida;
+
+        combustible = 0.0;
+
+        agregarMensaje(
+            "Vuelo parcial"
+            + distanciaRecorrida
+            + "km recorridos hasta agotar combustible"
+        );
+    }
+
+    protected void agregarMensaje(String mensaje){
+        bitácora.add(mensaje);
     }
 
     private void validarEstadoDeDespegue() {
-        throw new UnsupportedOperationException("Unimplemented method 'validarEstadoDeDespegue'");
+        if (combustible <= 0.0) {
+            throw new EstadoInvalidoException("Combustible insufuciente");
+        }
     }
 
-    private void prepararVuelo() {
-        throw new UnsupportedOperationException("Unimplemented method 'prepararVuelo'");
+    private void prepararVuelo(){
+        this.antesDeVolar();
     }
 
-    private void ejecutarVuelo(Double distanciaKm, Boolean volarHastaDondePueda) {
-        throw new UnsupportedOperationException("Unimplemented method 'ejecutarVuelo'");
+    private void antesDeVolar(){
+        this.agregarMensaje(this.mensaje());
     }
 
-    private void finalizarVuelo(double kilometrajeDado) {
-        throw new UnsupportedOperationException("Unimplemented method 'finalizarVuelo'");
+    protected abstract String mensaje();
+
+    protected abstract void finalizarVuelo(double kilometrajeDado);
+
+    protected void cambiarModo(Modo modoVuelo){
+        this.modoVuelo = modoVuelo;
     }
 
-    //Getters
+    // Metodos de consulta
+    // -------------------
+    public Boolean consumeReserva(Double combustibleNecesario) {
+        return (combustible - combustibleNecesario) < getReserva();
+    }
+
+    public Double calcularTiempoVuelo(Double distanciaKm){
+        return distanciaKm / modoVuelo.getVelocidadMax();
+    }
+
+    public Double calcularDistanciaDisponible() {
+        return combustible * modoVuelo.getConsumoPorLitro();
+    }
+
+    public boolean puedeVolar(Double distanciaKm) {
+        return combustible >= this.calcularCombustibleNecesario(distanciaKm);
+    }
+
+    public Double calcularCombustibleNecesario(Double distanciaKm) {
+        return distanciaKm / modoVuelo.getConsumoPorLitro();
+    }
+
+    // Getters
+    // -------
     public double getCombustible(){
         return combustible;
     }
@@ -80,14 +149,24 @@ public abstract class Helicoptero {
         return modoVuelo;
     }
 
-
-    public void agregarMensaje(String mensaje){
-        this.bitácora.add(mensaje);
+    public List<String> getBitacora(){
+        return bitácora;
     }
+    
 
-    public void antesDeVolar(){
-        agregarMensaje(this.doAntesDeVolar());
+    //
+    public  Boolean intentarVolar(Double distancia, Boolean puedeVolarHastaAqui){
+        try {
+            volar(distancia, puedeVolarHastaAqui);
+            this.agregarMensaje("Vuelo exitoso");
+            return true;
+        }catch(UsoDeReservaException e){
+            this.agregarMensaje("Vuelo fue realizado utilizando reserva de combustible");
+            return true;
+        }catch (EstadoInvalidoException e){
+            this.agregarMensaje("Vuelo cancelado" + e.getMessage());
+            return false;
+        }
+
     }
-
-    protected abstract String doAntesDeVolar();
 }

@@ -1,7 +1,7 @@
 package ar.edu.unahur.obj2.excepciones.modos;
 
 public interface Modo {
-    double getConsumo();
+    double getConsumoPorLitro();
 
     double getVelocidadMax();
 

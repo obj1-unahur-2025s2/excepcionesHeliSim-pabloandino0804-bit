@@ -2,7 +2,7 @@ package ar.edu.unahur.obj2.excepciones.modos;
 
 public class ModoEficiente implements Modo{
     @Override
-    public double getConsumo(){
+    public double getConsumoPorLitro(){
         return 14.0;
     }
 
