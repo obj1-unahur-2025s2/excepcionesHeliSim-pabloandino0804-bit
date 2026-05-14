@@ -14,9 +14,9 @@ public abstract class Helicoptero {
     protected double kilometraje = 0.0;
     protected double capacidad;
     protected List<String> bitácora = new ArrayList<>();
-    protected Modo modoVuelo;
+    protected Modo modoVuelo = new ModoEficiente();
 
-    public Helicoptero(double combustibleInicial, double capacidad, Modo modoVuelo){
+    public Helicoptero(double combustibleInicial, double capacidad){
         if (combustibleInicial < 0){
             throw new EstadoInvalidoException(
                 "No se puede inicializar un helicoptero con combustible negativo"
@@ -25,7 +25,6 @@ public abstract class Helicoptero {
         }
         this.combustible = combustibleInicial;
         this.capacidad = capacidad;
-        this.modoVuelo = new ModoEficiente();
     }
 
     // Metodos que modifican el objeto
@@ -82,17 +81,22 @@ public abstract class Helicoptero {
         bitácora.add(mensaje);
     }
 
-    private void validarEstadoDeDespegue() {
+    public void cambiarModo(Modo modoVuelo){
+        this.modoVuelo = modoVuelo;
+    }
+
+    //Metodos protegidos y Metodos privados
+    protected void validarEstadoDeDespegue() {
         if (combustible <= 0.0) {
             throw new EstadoInvalidoException("Combustible insufuciente");
         }
     }
 
-    private void prepararVuelo(){
+    protected void prepararVuelo(){
         this.antesDeVolar();
     }
 
-    private void antesDeVolar(){
+    protected void antesDeVolar(){
         this.agregarMensaje(this.mensaje());
     }
 
@@ -100,15 +104,12 @@ public abstract class Helicoptero {
 
     protected abstract void finalizarVuelo(double kilometrajeDado);
 
-    protected void cambiarModo(Modo modoVuelo){
-        this.modoVuelo = modoVuelo;
-    }
-
-    // Metodos de consulta
-    // -------------------
-    public Boolean consumeReserva(Double combustibleNecesario) {
+    private Boolean consumeReserva(Double combustibleNecesario) {
         return (combustible - combustibleNecesario) < getReserva();
     }
+    // Metodos de consulta
+    // -------------------
+    
 
     public Double calcularTiempoVuelo(Double distanciaKm){
         return distanciaKm / modoVuelo.getVelocidadMax();
@@ -124,6 +125,10 @@ public abstract class Helicoptero {
 
     public Double calcularCombustibleNecesario(Double distanciaKm) {
         return distanciaKm / modoVuelo.getConsumoPorLitro();
+    }
+
+    public Boolean entraEnReserva(Double distanciaKm) {
+        return consumeReserva(distanciaKm);
     }
 
     // Getters
