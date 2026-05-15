@@ -11,7 +11,7 @@ public class HelicopteroMilitar extends Helicoptero{
     }
 
     @Override
-    protected void validarEstadoDeDespegue(){
+    protected void validarEstadoDeDespegue() {
         super.validarEstadoDeDespegue();
         Boolean esAgresivo = this.getModoVuelo() instanceof ModoAgresivo;
         Boolean tieneCombustiblebajo = this.getCombustible() < minimoAgresivo;
@@ -21,7 +21,7 @@ public class HelicopteroMilitar extends Helicoptero{
                 + getCombustible() +
                 " litros. Se requiere al menos "
                 + minimoAgresivo +
-                "litros para operar este modo"
+                " litros para operar este modo."
             );
         }
     }

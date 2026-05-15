@@ -16,10 +16,10 @@ public abstract class Helicoptero {
     protected List<String> bitácora = new ArrayList<>();
     protected Modo modoVuelo = new ModoEficiente();
 
-    public Helicoptero(double combustibleInicial, double capacidad){
+    public Helicoptero(double combustibleInicial, double capacidad) {
         if (combustibleInicial < 0){
             throw new EstadoInvalidoException(
-                "No se puede inicializar un helicoptero con combustible negativo"
+                "No se puede inicializar un helicoptero con combustible negativo. "
                 + "valor recibido: " + combustibleInicial
             );
         }
@@ -29,7 +29,7 @@ public abstract class Helicoptero {
 
     // Metodos que modifican el objeto
     // -------------------------------
-    public void volar(Double distanciaKm, Boolean volarHastaDondePueda){
+    public void volar(Double distanciaKm, Boolean volarHastaDondePueda) {
         validarEstadoDeDespegue();
 
         prepararVuelo();
@@ -39,14 +39,14 @@ public abstract class Helicoptero {
         finalizarVuelo(kilometraje);
     }
     
-    private void ejecutarVuelo(Double distanciaKm, Boolean volarHastaQuePueda){
+    private void ejecutarVuelo(Double distanciaKm, Boolean volarHastaQuePueda) {
         Double combustibleNecesario = this.calcularCombustibleNecesario(distanciaKm);
 
         Boolean usaReserva = this.consumeReserva(combustibleNecesario);
 
-        if(!this.puedeVolar(distanciaKm)){
+        if(!this.puedeVolar(distanciaKm)) {
 
-            if (volarHastaQuePueda){
+            if (volarHastaQuePueda) {
                 volarParcialmente();
                 return;
             }
@@ -77,11 +77,11 @@ public abstract class Helicoptero {
         );
     }
 
-    protected void agregarMensaje(String mensaje){
+    protected void agregarMensaje(String mensaje) {
         bitácora.add(mensaje);
     }
 
-    public void cambiarModo(Modo modoVuelo){
+    public void cambiarModo(Modo modoVuelo) {
         this.modoVuelo = modoVuelo;
     }
 
@@ -92,11 +92,11 @@ public abstract class Helicoptero {
         }
     }
 
-    protected void prepararVuelo(){
+    protected void prepararVuelo() {
         this.antesDeVolar();
     }
 
-    protected void antesDeVolar(){
+    protected void antesDeVolar() {
         this.agregarMensaje(this.mensaje());
     }
 
@@ -111,7 +111,7 @@ public abstract class Helicoptero {
     // -------------------
     
 
-    public Double calcularTiempoVuelo(Double distanciaKm){
+    public Double calcularTiempoVuelo(Double distanciaKm) {
         return distanciaKm / modoVuelo.getVelocidadMax();
     }
 
@@ -119,7 +119,7 @@ public abstract class Helicoptero {
         return combustible * modoVuelo.getConsumoPorLitro();
     }
 
-    public boolean puedeVolar(Double distanciaKm) {
+    public Boolean puedeVolar(Double distanciaKm) {
         return combustible >= this.calcularCombustibleNecesario(distanciaKm);
     }
 
@@ -133,28 +133,28 @@ public abstract class Helicoptero {
 
     // Getters
     // -------
-    public double getCombustible(){
+    public double getCombustible() {
         return combustible;
     }
     
-    public double getKilometraje(){
+    public double getKilometraje() {
         return kilometraje;
     }
 
-    public double getCapacidad(){
+    public double getCapacidad() {
         return capacidad;
     }
     
     //
-    private double getReserva(){
+    private double getReserva() {
         return capacidad * 0.1;
     }
 
-    public Modo getModoVuelo(){
+    public Modo getModoVuelo() {
         return modoVuelo;
     }
 
-    public List<String> getBitacora(){
+    public List<String> getBitacora() {
         return bitácora;
     }
     
