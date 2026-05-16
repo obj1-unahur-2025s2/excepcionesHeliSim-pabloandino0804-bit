@@ -66,14 +66,14 @@ public abstract class Helicoptero {
     private void volarParcialmente() {
         Double distanciaRecorrida = calcularDistanciaDisponible();
 
-        kilometraje += distanciaRecorrida;
+        this.kilometraje += distanciaRecorrida;
 
-        combustible = 0.0;
+        this.combustible = 0.0;
 
         agregarMensaje(
-            "Vuelo parcial"
+            "Vuelo parcial "
             + distanciaRecorrida
-            + "km recorridos hasta agotar combustible"
+            + " km recorridos hasta agotar combustible."
         );
     }
 
@@ -106,6 +106,10 @@ public abstract class Helicoptero {
 
     private Boolean consumeReserva(Double combustibleNecesario) {
         return (combustible - combustibleNecesario) < getReserva();
+    }
+
+    private double getReserva() {
+        return capacidad * 0.1;
     }
     // Metodos de consulta
     // -------------------
@@ -146,10 +150,6 @@ public abstract class Helicoptero {
     }
     
     //
-    private double getReserva() {
-        return capacidad * 0.1;
-    }
-
     public Modo getModoVuelo() {
         return modoVuelo;
     }

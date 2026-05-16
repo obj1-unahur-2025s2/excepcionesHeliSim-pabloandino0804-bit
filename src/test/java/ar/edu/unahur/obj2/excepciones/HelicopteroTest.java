@@ -3,9 +3,12 @@ package ar.edu.unahur.obj2.excepciones;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeEach;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import ar.edu.unahur.obj2.excepciones.helicopteros.Helicoptero;
 import ar.edu.unahur.obj2.excepciones.helicopteros.HelicopteroCivil;
@@ -13,6 +16,7 @@ import ar.edu.unahur.obj2.excepciones.helicopteros.HelicopteroMilitar;
 import ar.edu.unahur.obj2.excepciones.modos.*;
 import ar.edu.unahur.obj2.excepciones.misExepciones.EstadoInvalidoException;
 import ar.edu.unahur.obj2.excepciones.misExepciones.MisionAbortadaException;
+import ar.edu.unahur.obj2.excepciones.misExepciones.UsoDeReservaException;
 
 
 public class HelicopteroTest {
@@ -22,8 +26,8 @@ public class HelicopteroTest {
 
     @BeforeEach
     void setUp(){
-        heliCivil = new HelicopteroCivil(100.00, 350.0);
-        heliMilitar = new HelicopteroMilitar(19.0, 350.0);
+        heliCivil = new HelicopteroCivil(100.0, 350.0);
+        heliMilitar = new HelicopteroMilitar(200.0, 350.0);
     }
     
     /*Tests constructores*/
@@ -58,35 +62,99 @@ public class HelicopteroTest {
 
     /*Tests de consulta */
     @Test
-    void EnModoEficienteElHelicopteroDevuelveElNombreDelModo() {
+    void alConsultarLaReservaElHeliDevuelveEl10DeSuCapacidad() {
+        List<String> listaVacia = new ArrayList<>();
+        assertEquals(heliCivil.getBitacora(), listaVacia);
+    }
+
+    @Test
+    void enModoEficienteElHelicopteroDevuelveElNombreDelModo() {
         Modo eficiente = new ModoEficiente();
         heliCivil.cambiarModo(eficiente);
         assertEquals(heliCivil.getModoVuelo().getNombre(), "Eficiente");
     }
 
     @Test
-    void EnModoNormalElHelicopteroDevuelveElNombreDelModo1() {
+    void enModoNormalElHelicopteroDevuelveElNombreDelModo1() {
         Modo normal = new ModoNormal();
         heliCivil.cambiarModo(normal);
         assertEquals(heliCivil.getModoVuelo().getNombre(), "Normal");
     }
     
     @Test
-    void EnModoAgresivoElHelicopteroDevuelveElNombreDelModo() {
+    void enModoAgresivoElHelicopteroDevuelveElNombreDelModo() {
         Modo agresivo = new ModoAgresivo();
         heliCivil.cambiarModo(agresivo);
         assertEquals(heliCivil.getModoVuelo().getNombre(), "Agresivo");
     }
 
+    @Test
+    void daTrueSIUnHeliPuedeVolarConLaCantSuperiorQueElCombustibleNecesario() {
+        assertTrue(heliCivil.puedeVolar(100.0));
+    }
+
+    @Test
+    void daTrueSiUnHeliPuedeEntrarEnReserva() {
+        assertTrue(heliCivil.entraEnReserva(85.0));
+    }
+
+    
+    @Test
+    void SiUnHelicopteroTieneUnBooleanoFalsoEntocesHaraUnVueloParcial() {
+        Modo eficiente = new ModoEficiente();
+        heliCivil.cambiarModo(eficiente);
+        heliCivil.volar(45.0, false);
+        assertEquals(heliCivil.getKilometraje(), 1400.0);
+        assertTrue(
+            heliCivil.getBitacora().contains("Vuelo parcial "+ heliCivil.getKilometraje() + " km recorridos hasta agotar combustible.")
+        );
+    }
+
+    /*Tests de excepciones */
+    @Test
+    void SiElHelicopteroTieneReservaRestanteLanzaraLaExcepcionDeReserva() {
+        assertThrows(
+            UsoDeReservaException.class, 
+            () -> heliCivil.volar(91.0, true)
+        );
+    }
+
+
+    @Test
+    void SiElHelicopteroNoTieneCombustibleAlValidarSuDespegueLanzaraLaExcepcionDEstadoInvalido() {
+        Helicoptero heli = new HelicopteroCivil(0.0, 150.0);
+        assertThrows(
+            EstadoInvalidoException.class, 
+            () -> heli.volar(40.0, true)
+        );
+    }
+
+    /*Tests de helicoptero civil */
+    @Test
+    void antesDeVolarElHeliCivilRegistraUnMensajeYDespuesFinalizaDandoUnMensaje() {
+        Modo normal = new ModoNormal();
+        heliCivil.cambiarModo(normal);
+        heliCivil.volar(450.0, heliCivil.getCapacidad() > 100.0);
+        assertTrue(heliCivil.getBitacora().contains("Pasajeros y equipaje verificados. Listo para despegue"));
+        assertTrue(heliCivil.getBitacora().contains("Vuelo civil completado: " + 450.0 + " km. Pasajeros desembarcados."));
+    }
     
     /*Tests de helicoptero militar*/
     @Test
-    void SiUnHeliMilitarTienePocoCombustibleYSuModoEsAgresivoLanzaraUnError() {
+    void siUnHeliMilitarTienePocoCombustibleYSuModoEsAgresivoLanzaraUnError() {
+        Helicoptero heliMilitar2 = new HelicopteroMilitar(15.0, 350.0);
         Modo modoAgresivo = new ModoAgresivo();
-        heliMilitar.cambiarModo(modoAgresivo);
+        heliMilitar2.cambiarModo(modoAgresivo);
         assertThrows(
             MisionAbortadaException.class, 
-            () -> heliMilitar.volar(23.0, true)
+            () -> heliMilitar2.volar(23.0, true)
         );
+    }
+
+    @Test 
+    void AntesDeVolarElHeliMilitarRegistraUnMensajeYDespuesFinalizaDandoUnMensaje() {
+        heliMilitar.volar(357.7, heliMilitar.getCapacidad()> 100.0);
+        assertTrue(heliMilitar.getBitacora().contains("Sistemas de armas y navegación activados"));
+        assertTrue(heliMilitar.getBitacora().contains("Mision completa: " + 357.7 + " km. Regresando a base."));
     }
 }

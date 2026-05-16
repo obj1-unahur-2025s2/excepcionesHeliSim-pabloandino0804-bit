@@ -33,7 +33,8 @@ public class HelicopteroMilitar extends Helicoptero{
 
     @Override
     protected void finalizarVuelo(double kilometrajeDado) {
-        agregarMensaje("Mision completa: " + kilometraje + " km. Regresando a base.");
+        agregarMensaje("Mision completa: " + kilometrajeDado + " km. Regresando a base.");
+        calcularTiempoVuelo(kilometrajeDado);
     }
 
 }
