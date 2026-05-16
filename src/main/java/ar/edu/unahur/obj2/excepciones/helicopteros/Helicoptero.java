@@ -169,7 +169,7 @@ public abstract class Helicoptero {
             this.agregarMensaje("Vuelo fue realizado utilizando reserva de combustible");
             return true;
         }catch (EstadoInvalidoException e){
-            this.agregarMensaje("Vuelo cancelado" + e.getMessage());
+            this.agregarMensaje("Vuelo cancelado " + e.getMessage());
             return false;
         }
 
